@@ -1,6 +1,6 @@
 ## Security Testing
 
-The security testing phase has started with MCUboot-based firmware authentication and hardware security features of the MCXN947.
+The security testing phase covers MCUboot-based firmware authentication, firmware update handling, and the hardware security features of the MCXN947.
 
 ### MCUboot
 
@@ -21,6 +21,45 @@ Bootloader chainload address offset: 0x14000
 ```
 
 and successfully starts the Zephyr application.
+
+The resulting boot flow is:
+
+```text
+MCUboot
+   ↓
+Zephyr application
+```
+
+### MCUboot Serial Recovery Configuration
+
+MCUboot serial recovery was enabled through:
+
+```text
+FW/sysbuild/mcuboot.conf
+```
+
+The relevant configuration includes:
+
+```text
+CONFIG_MCUBOOT_SERIAL=y
+CONFIG_BOOT_SERIAL_UART=y
+CONFIG_BOOT_SERIAL_WAIT_FOR_DFU=y
+CONFIG_BOOT_SERIAL_WAIT_FOR_DFU_TIMEOUT=5000
+CONFIG_MCUBOOT_SERIAL_DIRECT_IMAGE_UPLOAD=y
+CONFIG_BOOT_SERIAL_IMG_GRP_HASH=y
+CONFIG_BOOT_SERIAL_IMG_GRP_IMAGE_STATE=y
+```
+
+The serial recovery interface uses UART at:
+
+```text
+COM3
+115200 baud
+```
+
+Direct image upload is enabled so that MCUboot can receive an image through the MCUmgr serial transport.
+
+The secondary image slot is used for firmware update testing.
 
 ### Firmware Signing
 
@@ -85,6 +124,8 @@ Image validation
 Application
 ```
 
+![MCUboot boot verification](IMGS/MCUBOOT_0.png)
+
 ### Modified Firmware Rejection
 
 A negative security test was performed to verify that modification of a signed firmware image is detected by MCUboot.
@@ -116,9 +157,62 @@ The original signed image was restored. Its SHA-256 hash was verified:
 
 The restored image matched the known-good firmware hash.
 
+![Modified firmware rejection test](IMGS/terminal-byte-change.png)
+
 **Result: PASS**
 
 This test demonstrates that modification of a signed firmware image causes MCUboot image validation to fail and prevents the modified image from being booted.
+
+### Good and Bad Firmware Image Verification
+
+A separate good/bad image test was performed using MCUboot `imgtool`.
+
+The known-good signed image was copied to:
+
+```text
+test_images/firmware-good.bin
+```
+
+The image was verified using the MCUboot `imgtool` utility:
+
+```text
+python imgtool.py verify test_images/firmware-good.bin
+```
+
+The result was:
+
+```text
+Image was correctly validated
+Image version: 0.0.0+0
+```
+
+**Good firmware: PASS**
+
+A second copy was modified by changing one byte after signing:
+
+```text
+test_images/firmware-bad.bin
+```
+
+Verification of the modified image produced:
+
+```text
+Image has an invalid hash
+```
+
+**Bad firmware: PASS**
+
+The modified image was also uploaded through MCUboot serial recovery. The transport upload completed successfully, but MCUboot did not report the image as bootable in `image list`.
+
+This confirms the distinction between successful transport and successful image validation:
+
+```text
+Successful transport upload
+        ≠
+Valid firmware image
+```
+
+The firmware image must still pass MCUboot validation before it can be used for boot.
 
 ### Hardware Secure Boot
 
@@ -154,6 +248,8 @@ The device was provisioned in development lifecycle mode.
 
 The provisioning process successfully installed the required security assets and loaded the secure boot image.
 
+![Secure Provisioning Tool configuration](IMGS/secure_provisioningtool_config.png)
+
 After reset, the device successfully booted through the existing MCUboot software boot stage and started the Zephyr application.
 
 This confirms that hardware security provisioning can coexist with the existing MCUboot-based software boot chain.
@@ -182,33 +278,108 @@ The exact relationship between the hardware Root of Trust, the Secure Provisioni
 
 ### Firmware Update Mechanism
 
-The next stage is to implement a real MCUboot firmware update mechanism.
+A functional MCUboot firmware update mechanism has been implemented and tested using MCUboot serial recovery over UART.
 
-The goal is to update the Zephyr application without directly programming the application slot through the debug interface.
-
-The intended update flow is:
+The tested update flow is:
 
 ```text
 New firmware
     ↓
 MCUboot image signing
     ↓
-Firmware update transport
+MCUmgr serial transport
     ↓
 MCUboot secondary slot
     ↓
-RSA signature verification
+Image validation
     ↓
-Image swap / update
+image test / pending state
     ↓
-New Zephyr application
+Device reset
+    ↓
+Image swap
+    ↓
+New primary image
+    ↓
+Image confirmed
 ```
 
-The initial update mechanism will use MCUboot's serial recovery/update functionality over UART.
+The MCUboot partition layout used by the project is:
 
-This will allow the project to test firmware updates in a way that is representative of a deployed device, without relying on direct debug-interface programming.
+```text
+MCUboot:
+    0x10000000 - 0x10013FFF
 
-The update mechanism will also be used to test whether MCUboot continues to enforce RSA signature verification after hardware Secure Boot has been enabled.
+Primary image slot:
+    0x10014000 - 0x10109FFF
+
+Secondary image slot:
+    0x1010A000 - 0x101FFFFF
+```
+
+For the configured swap-offset mechanism, the uploaded secondary image is stored with the MCUboot swap offset.
+
+MCUboot serial recovery was tested using `mcumgr`.
+
+The secondary image was uploaded using:
+
+```text
+mcumgr -c mcxn image upload firmware-good.bin -n 2
+```
+
+The image was then visible in the secondary slot.
+
+Before the update:
+
+```text
+image=0 slot=0
+    flags: active confirmed
+
+image=0 slot=1
+    flags:
+```
+
+After marking the secondary image for testing:
+
+```text
+image=0 slot=0
+    flags: confirmed
+
+image=0 slot=1
+    flags: pending
+```
+
+After reset, MCUboot performed the update and the resulting state was:
+
+```text
+image=0 slot=0
+    flags: active confirmed
+
+image=0 slot=1
+    flags:
+```
+
+This confirms successful use of the MCUboot secondary slot and image swap mechanism.
+
+![MCUboot serial recovery and image state](IMGS/MCUBOOT_1.png)
+
+### Firmware Update Security
+
+The firmware update mechanism was tested with both valid and modified firmware images.
+
+A valid signed image was successfully uploaded to the secondary slot, marked as pending, and accepted by MCUboot after reset.
+
+The modified firmware image was created by changing one byte after signing.
+
+The modified image failed image verification:
+
+```text
+Image has an invalid hash
+```
+
+and was not reported by MCUboot as a bootable secondary image.
+
+This demonstrates that the MCUboot image validation mechanism remains active during the firmware update process.
 
 ### Root of Trust
 
@@ -233,27 +404,32 @@ No further irreversible security configuration, OTP programming, lifecycle trans
 * [x] Project-specific RSA-2048 signing key
 * [x] Signed firmware successfully booted through MCUboot
 * [x] Modified firmware rejection test
+* [x] Good firmware image verification
+* [x] Bad firmware image verification
 * [x] MCUXpresso Secure Provisioning Tool setup
 * [x] Hardware security provisioning in development lifecycle
 * [x] Hardware Secure Boot configuration
 * [x] Secure boot image successfully generated
 * [x] Provisioned device successfully booted
+* [x] MCUboot serial recovery/update mechanism
+* [x] Firmware upload to MCUboot secondary slot
+* [x] MCUboot image test / pending state
+* [x] MCUboot image swap
+* [x] Firmware update confirmation
+* [x] Firmware modification rejection during update
 
 ### Security Tests — Planned
 
-* [ ] MCUboot serial recovery/update mechanism
-* [ ] Firmware update using MCUboot secondary slot
-* [ ] Invalid signature test
-* [ ] Wrong public key / wrong signing key test
-* [ ] Firmware update rejection after image modification
 * [ ] Image version and downgrade protection
+* [ ] Invalid signature test using a different signing key
+* [ ] Wrong public key / wrong signing key test
 * [ ] Hardware cryptographic feature testing
 * [ ] Memory protection testing
 * [ ] Access control testing
 * [ ] Debug/security lifecycle testing
 * [ ] Hardware Root of Trust investigation
-* [ ] Relationship between hardware Secure Boot and MCUboot authentication
-* [ ] Other relevant MCXN947 security feature testing
+* [ ] Detailed relationship between hardware Secure Boot and MCUboot authentication
+* [ ] Additional MCXN947 security feature testing
 
 Each security mechanism will be investigated and tested individually.
 
@@ -275,16 +451,20 @@ The results, configuration, test procedure, expected behavior, observed behavior
 * [x] Project-specific RSA-2048 signing key
 * [x] Signed firmware successfully booted through MCUboot
 * [x] Modified firmware rejection test
+* [x] Good/bad firmware image verification
 * [x] MCUXpresso Secure Provisioning setup
 * [x] Hardware security provisioning
 * [x] Hardware Secure Boot configuration
 * [x] Secure boot image generated
 * [x] Provisioned device successfully booted
-* [ ] MCUboot firmware update mechanism
-* [ ] MCUboot serial recovery/update
-* [ ] Invalid signature test
+* [x] MCUboot firmware update mechanism
+* [x] MCUboot serial recovery/update
+* [x] MCUboot secondary slot update
+* [x] MCUboot image test / pending state
+* [x] MCUboot image swap
+* [x] Firmware modification rejection during update
+* [ ] Invalid signature test using a different signing key
 * [ ] Wrong public key / wrong signing key test
-* [ ] Firmware modification rejection during update
 * [ ] Image downgrade protection test
 * [ ] Hardware cryptographic feature testing
 * [ ] Memory protection testing

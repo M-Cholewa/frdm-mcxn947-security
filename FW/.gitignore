@@ -32,7 +32,6 @@ generated/
 # MCUboot / sysbuild generated output
 
 mcuboot/
-sysbuild/
 
 # VS Code
 

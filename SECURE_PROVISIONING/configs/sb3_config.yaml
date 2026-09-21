@@ -51,7 +51,7 @@ commands:
   # Erase flash for the image 0
   - erase:
       address: 0
-      size: '0x0000E000'
+      size: '0x00010000'
       memoryId: 0
 
   # Write the application image 0 to flash

@@ -35,9 +35,9 @@
         "uart_speed": 115200
     },
     "build_image_settings": {
-        "source_image_path": "../FW/build/mcuboot/zephyr/zephyr.bin",
+        "source_image_path": "../FW/build/mcuboot/zephyr/zephyr.elf",
         "secured_firmware_version_int": "0",
-        "start_address_int": "0x10014000",
+        "start_address_int": "0x10000000",
         "dcd_type": "None",
         "tz_enable": true,
         "img_key_id": "IMG1_1",
