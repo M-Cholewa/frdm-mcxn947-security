@@ -1,0 +1,59 @@
+
+# Pliki systemowe i tymczasowe
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.log
+
+# Środowiska IDE
+.idea/
+.vscode/
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Projekty MCUXpresso / Eclipse
+.metadata/
+.settings/
+.project
+.cproject
+Debug/
+Release/
+debug/
+release/
+build/
+out/
+cmake-build-*/
+
+# Pliki wynikowe kompilacji
+*.o
+*.obj
+*.d
+*.elf
+*.axf
+*.hex
+*.bin
+*.map
+*.lst
+*.su
+*.a
+*.lib
+
+# Narzędzia i cache
+.cache/
+.clangd/
+compile_commands.json
+*.bak
+*.orig
+
+# Firmware i artefakty debugowania
+*.uf2
+*.jlink
+*.jdebug
+*.launch
+*.elf.*/
+

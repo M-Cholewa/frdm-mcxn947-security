@@ -1,0 +1,70 @@
+# Zephyr / West build output
+
+build/
+.venv/
+.west/
+
+# CMake
+
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+Makefile
+
+# Ninja
+
+.ninja_deps
+.ninja_log
+.ninja*
+
+# Compilation database
+
+compile_commands.json
+
+# Zephyr generated files
+
+zephyr/
+modules/
+include/generated/
+generated/
+
+# MCUboot / sysbuild generated output
+
+mcuboot/
+sysbuild/
+
+# VS Code
+
+.vscode/
+*.code-workspace
+
+# Visual Studio / IDE
+
+.vs/
+*.user
+*.suo
+
+# Python
+
+**pycache**/
+*.py[cod]
+*.pyo
+
+# OS
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+
+*.log
+
+# Temporary files
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
