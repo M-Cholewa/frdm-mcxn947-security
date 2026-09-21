@@ -1,226 +1,164 @@
-# FRDM-MCXN947 — Zephyr Security Project
+**## Security Testing**
 
-Firmware project for the NXP FRDM-MCXN947 development board based on Zephyr RTOS.
+The security testing phase has started with MCUboot-based firmware authentication.
 
-The goal of this project is to develop a custom firmware application and systematically investigate and test the security features available on the MCXN947 microcontroller.
+**### MCUboot**
 
-## Hardware
+MCUboot has been integrated into the Zephyr application using Sysbuild.
 
-* NXP FRDM-MCXN947
-* MCU: NXP MCXN947
-
-## Development Environment
-
-* Windows
-* NXP MCUXpresso IDE
-* NXP LinkServer
-* Zephyr RTOS
-* Zephyr SDK
-* VS Code
-* Python
-* West
-
-## Initial Setup
-
-### 1. MCUXpresso
-
-NXP MCUXpresso IDE was installed together with the required NXP development and debugging tools.
-
-LinkServer is used for programming and communicating with the development board.
-
-### 2. Zephyr
-
-Zephyr RTOS was installed following the official Zephyr documentation.
-
-The Zephyr workspace is kept separately from the application source code.
-
-The application project is maintained independently in:
+The configuration enables MCUboot with:
 
 ```text
-FW/
+SB_CONFIG_BOOTLOADER_MCUBOOT=y
 ```
 
-This keeps the application source code separate from the Zephyr workspace.
+MCUboot was successfully flashed to the MCXN947 and verified to chainload the application.
 
-### 3. Zephyr SDK
-
-The Zephyr SDK was installed and configured to provide the required toolchain for building Zephyr applications.
-
-### 4. First Test
-
-The Zephyr `blinky` sample application was built and flashed first to verify that the development environment was working correctly.
-
-This verified:
-
-* Zephyr installation
-* Toolchain
-* Zephyr SDK
-* Board support
-* Build process
-* Flashing process
-* Communication with the development board
-
-The test was successful.
-
-### 5. Custom Zephyr Application
-
-After verifying the development environment, a custom Zephyr application was created from scratch without using an existing application example as the project base.
-
-Current project structure:
+The bootloader reports the application chainload address:
 
 ```text
-FW/
-├── .gitignore
-├── README.md
-├── CMakeLists.txt
-├── prj.conf
-├── sysbuild.conf
-├── build.ps1
-└── src/
-    └── main.c
+Bootloader chainload address offset: 0x14000
 ```
 
-The application is built for:
+and successfully starts the Zephyr application.
+
+**### Firmware Signing**
+
+Firmware signing has been enabled.
+
+A project-specific RSA-2048 key pair was generated using the MCUboot `imgtool` utility.
+
+The private signing key is stored locally in:
 
 ```text
-frdm_mcxn947/mcxn947/cpu0
+keys/mcuboot-rsa-2048.pem
 ```
 
-The firmware was successfully compiled and flashed to the MCXN947.
+The private key is not intended to be stored in the firmware image or committed to the repository.
 
-### 6. UART
-
-UART communication with the development board was verified.
-
-Current serial configuration:
+Private key files are excluded from Git using:
 
 ```text
-COM3
-115200 baud
-8N1
+*.pem
+*.key
 ```
 
-The firmware successfully outputs the Zephyr boot message and the application message:
+The project configuration points to the project-specific signing key:
 
 ```text
+SB_CONFIG_BOOT_SIGNATURE_KEY_FILE="C:/Users/name/Desktop/mateus/PROJEKTY/FRDM-MCXN947/keys/mcuboot-rsa-2048.pem"
+```
+
+The generated application image includes the MCUboot image header and signature data:
+
+```text
+FW/build/FW/zephyr/zephyr.signed.bin
+```
+
+The build configuration confirms that the project-specific key is used for image signing.
+
+**### Signature Verification**
+
+The signed firmware was flashed together with MCUboot.
+
+After programming, MCUboot successfully processed the image and chainloaded the application:
+
+```text
+I: Bootloader chainload address offset: 0x14000
+I: Image version: v0.0.0
+I: Jumping to the first image slot
+
+*** Booting Zephyr OS build ...
+
 Hello World from my own MCXN947 project!
 ```
 
-## Configuration
-
-The `build.ps1` script contains local paths required by the development environment.
-
-Before using this project on another computer, update the following values in `build.ps1`:
-
-```powershell
-$env:ZEPHYR_BASE = "C:\Users\name\zephyrproject\zephyr"
-
-$env:Path += ";E:\MCUXpressoIDE_25.6.136\ide\LinkServer"
-```
-
-`ZEPHYR_BASE` must point to the local Zephyr repository.
-
-The LinkServer path must point to the `LinkServer` directory installed with MCUXpresso.
-
-The serial port can also be changed if the development board is assigned a different COM port:
-
-```powershell
-$SERIAL_PORT = "COM3"
-```
-
-The default baud rate is:
-
-```powershell
-$BAUD_RATE = "115200"
-```
-
-These settings are intentionally kept in the script so the project can be built, flashed and monitored without manually configuring environment variables in every terminal session.
-
-## Build
-
-Build the project using:
-
-```powershell
-.\build.ps1 build
-```
-
-## Flash
-
-Build and flash the firmware:
-
-```powershell
-.\build.ps1 flash
-```
-
-## Serial Monitor
-
-Start the UART monitor:
-
-```powershell
-.\build.ps1 monitor
-```
-
-The monitor uses:
+This confirms the positive boot path:
 
 ```text
-COM3
-115200 8N1
+Build
+  ↓
+Firmware signing
+  ↓
+MCUboot
+  ↓
+Image validation
+  ↓
+Application
 ```
 
-The terminal is provided by Python `pyserial`.
+**### Modified Firmware Rejection**
 
-## Flash and Monitor
+A negative security test was performed to verify that modification of a signed firmware image is detected by MCUboot.
 
-The complete development cycle can be performed with:
-
-```powershell
-.\build.ps1 flash-monitor
-```
-
-This command:
-
-1. Builds the application.
-2. Flashes the firmware to the board.
-3. Starts the serial monitor.
-
-To exit the serial monitor, press:
+First, the known-good signed firmware image was preserved:
 
 ```text
-Ctrl+]
+FW/build/FW/zephyr/zephyr.signed.original.bin
 ```
 
-## Clean Build
+A copy of the signed firmware was then modified by changing a single byte.
 
-To remove the generated build directory:
+The modified image was flashed without rebuilding the application.
 
-```powershell
-.\build.ps1 clean
+During the subsequent boot attempt, MCUboot rejected the modified image:
+
+```text
+E: Image in the primary slot is not valid!
+E: Unable to find bootable image
 ```
 
-## Security Testing
+The application was therefore not chainloaded from the modified image.
 
-The next stage of the project is to systematically investigate and test the security features available on the MCXN947.
+The original signed image was then restored. Its SHA-256 hash was verified against the backup:
 
-The planned work includes:
+```text
+6B032496CBCE4F0E9768B0731C3957DB6F750B0CD4B30391C7468A909D17810C
+```
 
-* Secure Boot
-* MCUboot
-* Firmware signing
-* Signature verification
-* Protection against modified firmware
-* Invalid signature testing
-* Wrong public key testing
-* Cryptographic hardware features
-* Memory protection mechanisms
-* Access control mechanisms
-* Debug and security lifecycle features
-* Other security features available on the MCXN947
+Both files produced the same hash, confirming that the original signed image had been restored correctly.
+
+**Result: PASS**
+
+This test demonstrates that modifying a signed firmware image causes MCUboot image validation to fail and prevents the modified image from being booted.
+
+**### Root of Trust**
+
+The next stage of the security investigation is the Root of Trust.
+
+The project distinguishes between:
+
+1. The private signing key used to create firmware signatures.
+2. The trusted public-key material used by MCUboot to verify firmware signatures.
+3. MCUboot as the software boot stage responsible for validating the application image.
+4. Hardware security mechanisms that may provide a hardware-enforced trust anchor.
+
+The private signing key remains outside the firmware image and should not be embedded into the application or committed to the repository.
+
+The next investigation will determine how the MCXN947 establishes and protects the initial trust anchor and whether the device provides hardware-enforced Secure Boot functionality.
+
+No irreversible security configuration, OTP programming, lifecycle transition, or security fuse programming will be performed until the available mechanisms and recovery implications are fully understood.
+
+**### Security Tests — Planned**
+
+The following tests are planned:
+
+* Sign firmware with a different RSA key and verify that MCUboot rejects it
+* Test an invalid or corrupted signature
+* Investigate image version and downgrade protection
+* Investigate cryptographic hardware features
+* Investigate memory protection mechanisms
+* Investigate access control mechanisms
+* Investigate debug security and lifecycle states
+* Investigate hardware security / Secure Boot capabilities of the MCXN947
+* Investigate the hardware Root of Trust and its relationship with the software boot chain
+* Document other relevant security features available on the MCXN947
 
 Each security mechanism will be investigated and tested individually.
 
-The results, configuration, test procedure, and observations will be documented in this repository.
+The results, configuration, test procedure, expected behavior, observed behavior, and conclusions will be documented in this repository.
 
-## Project Status
+**## Project Status**
 
 * [x] MCUXpresso IDE
 * [x] LinkServer
@@ -231,7 +169,18 @@ The results, configuration, test procedure, and observations will be documented 
 * [x] Build
 * [x] Flash
 * [x] UART
-* [ ] MCUboot
-* [ ] Firmware signing
-* [ ] Secure Boot
-* [ ] Security feature testing
+* [x] MCUboot
+* [x] Firmware signing
+* [x] Project-specific RSA-2048 signing key
+* [x] Signed firmware successfully booted through MCUboot
+* [x] Modified firmware rejection test
+* [ ] Invalid signature test
+* [ ] Wrong public key / wrong signing key test
+* [ ] Image downgrade protection test
+* [ ] Hardware cryptographic feature testing
+* [ ] Memory protection testing
+* [ ] Access control testing
+* [ ] Debug/security lifecycle testing
+* [ ] Hardware Root of Trust investigation
+* [ ] Hardware Secure Boot investigation
+* [ ] Other MCXN947 security feature testing
