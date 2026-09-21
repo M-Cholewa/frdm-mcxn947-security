@@ -1,0 +1,62 @@
+<font face="Segoe UI" size="2" color="#000000" ><p align="left"><font size="4"><p>This file contains description, how the workspace was created by Secure Provisioning Tool</p></font>
+<p>Creation date: 2026-09-21 19:16:40</p><p>Selected profile: Plain signed image running on onchip flash</p><font size="4"><p>Workspace is created with these settings: </p></font>
+<ul>
+<li>New keys generated: 4 ECC (Chain RoT + IMG) keys of length p256 </li>
+<li>First IMG key is selected as image signing key </li>
+<li>Random value for CUST_MK_SK generated </li>
+<li>Random value for SB seed generated </li>
+<li>CMPA register SECURE_BOOT_CFG bit-field SEC_BOOT_EN set to: ECDSA_SIGNED/0b11 </li>
+<li>Flash access for region 0x00000000-0x00007FFF was set to DEFAULT_RWX_UNLOCKED/0b000 in CFPA register FLASH_ACL_0_7 bitfield ACL_SEC_0</li>
+</ul><font face="Segoe UI" size="4" color="#000000" ><font  size="4" >Configuration details</font></font></p>
+
+<p align="left"><font face="Segoe UI" size="2" color="#000000" >In this profile, the following features are configured for you:</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >Boot device: Onchip flash - internal flash (tested on board: FRDM-MCXN947)</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Boot type: Plain signed</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Random CUST_MK_SK and SB seed generated</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >New keys generated: 4 ECC (Chain RoT + IMG) keys of length p256</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >First IMG key is selected as image signing key</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Trust Zone is enabled but not configured; application is expected to configure it in runtime or use TrustZone preset data</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Device HSM trust provisioning enabled</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Opens MCUboot dialog to help configure and sign MCUboot application</font>
+</ul><p align="left"><font face="Segoe UI" size="2" color="#000000" ></font></p>
+
+<p align="left"><font face="Segoe UI" size="4" color="#000000" ><font  size="4" >Supported features of MCXN947</font></font></p>
+
+<p align="left"><font face="Segoe UI" size="2" color="#0078D4" ><font  style="color: #0078D4" ><u><a href="https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/mcx-arm-cortex-m/mcx-n-series/mcx-n94x-and-n54x-mcus-with-dual-core-arm-cortex-m33-edgelock-secure-subsystem-and-neural-processing-unit:MCX-N94X-N54X">https://www.nxp.com/products/processors-...-and-neural-processing-unit:MCX-N94X-N54X</a></u></font></font>
+<p align="left"><font face="Segoe UI" size="2" color="#000000" >Trust provisioning options:</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >Device HSM</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >EdgeLock 2GO with device ID</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >EdgeLock 2GO per product type</font>
+</ul><p align="left"><font face="Segoe UI" size="2" color="#000000" >Advanced features:</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >TrustZone</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Anti-rollback protection</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Debug authentication</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >MCUboot secondary bootloader - sample bin.app. and default settings</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Signature provider</font>
+</ul><p align="left"><font face="Segoe UI" size="2" color="#000000" >Boot type options:</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >Plain unsigned</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Plain with CRC</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Plain signed</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Encrypted (PRINCE/IPED) unsigned</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Encrypted (PRINCE/IPED) with CRC</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Encrypted (PRINCE/IPED) signed</font>
+</ul><p align="left"><font face="Segoe UI" size="2" color="#000000" >Boot device options:</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >Onchip flash (dual boot, XIP)</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >IFR flash (XIP)</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >FlexSPI NOR (dual boot, XIP)</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >Onchip RAM (XIP)</font>
+</ul><p align="left"><font face="Segoe UI" size="2" color="#000000" >Connection options (via blhost tool):</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >USB</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >UART</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >SPI</font>
+<li> <font face="Segoe UI" size="2" color="#000000" >I2C</font>
+</ul><p align="left"><font face="Segoe UI" size="2" color="#000000" >MCUXpresso SDK name(s):</font>
+<p>
+<ul><li> <font face="Segoe UI" size="2" color="#000000" >MCXN947</font>
+</ul></font>

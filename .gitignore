@@ -60,3 +60,11 @@ compile_commands.json
 # Klucze kryptograficzne - NIGDY nie commitować
 *.pem
 *.key
+
+# Secure Provisioning Tool - wygenerowane artefakty
+
+SECURE_PROVISIONING/bootable_images/
+SECURE_PROVISIONING/keys/
+SECURE_PROVISIONING/*.log
+SECURE_PROVISIONING/*.json
+SECURE_PROVISIONING/*.xml

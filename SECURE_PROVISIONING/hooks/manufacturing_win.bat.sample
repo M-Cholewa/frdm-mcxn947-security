@@ -1,0 +1,34 @@
+@echo off
+@rem Copyright 2024 NXP
+@rem SPDX-License-Identifier: BSD-3-Clause
+@rem This is sample of the manufacturing hooks, that are executed from the manufacturing script. This allows to customize the operation executed from the manufacturing script
+@rem Use parameter: "<step>" to identify which hook should be executed
+@rem "<step>" is used as label call
+@rem manufacturing step finished is called with second argument 'status' with 'ok' or 'fail' arguments to notify the automation about the status
+IF NOT "%2"=="" (
+    IF "%2"=="-status" (
+        SET status=%3
+    )
+)
+call :%1 2>NUL
+if errorlevel 2 goto error_state
+if errorlevel 1 goto non_defined
+exit /B 0
+:non_defined
+@echo parameter %1 is not supported
+exit /B 2
+:error_state
+@echo step %1 failed
+exit /B 2
+
+:started
+@rem hook executed before the start of the manufacturing tasks
+@echo ### execution of manufacturing-hook: started ###
+goto end
+:finished
+@rem hook executed after the manufacturing process is finished, with additional parameter '-status' result of manufacturing process
+@echo ### execution of manufacturing-hook: finished %status% ###
+goto end
+:end
+@rem Reset error state at the end of the step execution, failed commands should be handled in step handling.
+ver > NUL

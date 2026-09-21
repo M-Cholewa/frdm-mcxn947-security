@@ -1,0 +1,72 @@
+@echo off
+@rem Copyright 2024 NXP
+@rem SPDX-License-Identifier: BSD-3-Clause
+@rem This is sample of the write hooks, that are executed from the write script. This allows to customize the operation executed from the write script
+@rem Use parameter: "<step>" to identify which hook should be executed
+@rem "<step>" is used as label call
+call :%1 2>NUL
+if errorlevel 2 goto error_state
+if errorlevel 1 goto non_defined
+exit /B 0
+:non_defined
+@echo parameter %1 is not supported
+exit /B 2
+:error_state
+@echo step %1 failed
+exit /B 2
+
+:started
+@rem hook executed before any other command is executed
+@echo ### execution of write-hook: started ###
+goto end
+:erase_done
+@rem hook executed after erase of the memory is done
+@echo ### execution of write-hook: erase_done ###
+goto end
+:configure_ext_memory_done
+@rem hook executed after external memory configuration is done
+@echo ### execution of write-hook: configure_ext_memory_done ###
+goto end
+:create_fcb_done
+@rem hook executed after creation of FCB in the memory is done
+@echo ### execution of write-hook: create_fcb_done ###
+goto end
+:cfpa_written
+@rem hook executed after write of the CFPA is done
+@echo ### execution of write-hook: cfpa_written ###
+goto end
+:cmpa_written
+@rem hook executed after write of the CMPA is done
+@echo ### execution of write-hook: cmpa_written ###
+goto end
+:device_provisioning_sb_processed
+@rem hook executed after device provisioning SB file is processed
+@echo ### execution of write-hook: device_provisioning_sb_processed ###
+goto end
+:el2go_provisioning_completed
+@rem hook executed after EgdeLock 2GO provisioning is completed
+@echo ### execution of write-hook: el2go_provisioning_completed ###
+goto end
+:image_written
+@rem hook executed after write of the image is done
+@echo ### execution of write-hook: image_written ###
+goto end
+:additional_images_written
+@rem hook executed after write of additional images is done
+@echo ### execution of write-hook: additional_images_written ###
+goto end
+:sb_file_processed
+@rem hook executed after processing of SB file is done
+@echo ### execution of write-hook: sb_file_processed ###
+goto end
+:all_fuses_burnt
+@rem hook executed after fuse burn is done
+@echo ### execution of write-hook: all_fuses_burnt ###
+goto end
+:finished
+@rem hook executed after all steps of the script were executed
+@echo ### execution of write-hook: finished ###
+goto end
+:end
+@rem Reset error state at the end of the step execution, failed commands should be handled in step handling.
+ver > NUL

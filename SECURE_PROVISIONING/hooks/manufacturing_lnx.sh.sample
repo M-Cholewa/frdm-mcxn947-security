@@ -1,0 +1,20 @@
+#! /bin/bash
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+# This is sample of the manufacturing hooks, that are executed from the manufacturing script. This allows to customize the operation executed from the manufacturing script
+# Use parameter: "<step>" to identify which hook should be executed
+# manufacturing step finished is called with second argument 'status' with 'ok' or 'fail' arguments to notify the automation about the status
+case "${1}" in
+  started)
+    # hook executed before the start of the manufacturing tasks
+    echo "### execution of manufacturing-hook: started ###"
+    ;;
+  finished)
+    # hook executed after the manufacturing process is finished, with additional parameter '-status' result of manufacturing process
+    echo "### execution of manufacturing-hook: finished $3 ###"
+    ;;
+  *)
+    echo "parameter ${1} is not supported"
+    exit 2
+    ;;
+esac

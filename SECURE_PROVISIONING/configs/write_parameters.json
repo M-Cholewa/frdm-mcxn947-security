@@ -1,0 +1,25 @@
+{
+    "fuses": {
+        "preset_mode": "otp_fuses",
+        "groups": [
+            {
+                "id": "LC_STATE",
+                "description": "LC state configuration",
+                "script_parameter": "burn_LC_state",
+                "registers": [
+                    {
+                        "id": "fuse1",
+                        "value_int": "0",
+                        "mask_int": "0x0004"
+                    }
+                ]
+            }
+        ]
+    },
+    "dual_image_boot_config": {
+        "dual_image_target": "disabled",
+        "image1_offset_int": "0x00100000",
+        "image1_size_int": "0x00010000"
+    },
+    "image_start_addr_int": "0x10000000"
+}

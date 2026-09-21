@@ -1,0 +1,23 @@
+# ===========  Master Boot Image Configuration for MCX N94x/N54x  ===========
+# ----------------------------------------------------------------------------------------------------
+#                                         == Basic Settings ==                                        
+# ----------------------------------------------------------------------------------------------------
+family: mcxn947  # [Required], MCU family name
+outputImageExecutionTarget: xip  # [Required], Application target; Definition if application is Execute in Place(XiP) or loaded to RAM during reset sequence; Possible options: ['xip', 'load-to-ram']
+outputImageAuthenticationType: Signed  # [Required], Type of boot image authentication; Specification of final master boot image authentication; Possible options:['plain', 'crc', 'signed', 'signed-encrypted', 'signed-nxp']
+masterBootOutputFile: ../bootable_images/MCXN_ram_reset_app.bin  # [Required], Master Boot Image name; The file for Master Boot Image result file.
+inputImageFile: E:/NXP_SEC_PROV_TOOL/bin/_internal/data/fw/MCXN_ram_reset_app/MCXN_ram_reset_app.s19  # [Required], Plain application image; The input application image to by modified to Master Boot Image.
+outputImageExecutionAddress: 0x20000000 # [Required], Loading address of application; Application loading address in RAM if not XiP, otherwise address of load in XiP.
+
+# ======================================================================================================================
+#                                              == Certificate Block V2.1 ==
+# ======================================================================================================================
+# -----------------------------===== Certificate Block binary/config file [Required] =====------------------------------
+# Description: Path to certificate block binary or config file.
+certBlock: ../keys/IMG1_1_cert_block.bin
+# ======================================================================================================================
+#                                              == Image Signing Settings ==
+# ======================================================================================================================
+# -------------------------------===== Signature Provider [Conditionally required] =====--------------------------------
+# Description: Signature provider configuration in format 'type=<sp_type>;<key1>=<value1>;<key2>=<value2>".
+signer: type=file;file_path=../keys/IMG1_1_p256.pem

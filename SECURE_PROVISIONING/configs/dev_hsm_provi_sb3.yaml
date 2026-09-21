@@ -1,0 +1,62 @@
+# ==================================  SB configuration from Secure Provisioning Tool  ==================================
+
+# ======================================================================================================================
+#                                                 == General Options ==                                                 
+# ======================================================================================================================
+# -------------------------------------===== The chip family name [Required] =====--------------------------------------
+# Description: NXP chip family identifier.
+family: mcxn947
+# ======================================================================================================================
+#                                              == Common DevHSM settings ==                                             
+# ======================================================================================================================
+# -----------------------------===== OEM Random Share input [Conditionally required] =====------------------------------
+# Description: Path to a file containing 16B of random seed data. If not specified, random seed will be generated. In
+# case that 'oemEncMasterShare' is defined, the 'oemRandomShare' must be defined with the original random seed that has
+# been used to create OEM Encrypted master share.
+oemRandomShare: sb_seed.bin
+# --------------------------------------===== Final device reset [Optional] =====---------------------------------------
+# Description: Reset the device after the DevHSM operation
+finalReset: true
+# ----------------------------------===== Development/debug workspace [Optional] =====----------------------------------
+# Description: Path to a folder where to store intermediate artifacts for development/debugging purposes
+workspace: tmp_nxpdevhsm
+# ======================================================================================================================
+#                                   == Secure Binary v3.1 / v4.0 Commands Settings ==                                   
+# ======================================================================================================================
+commands:
+
+  # Update CMPA page
+  - load:
+      address: '0x01004000'
+      data: cmpa.bin
+
+  # Load reset application to the internal RAM
+  - load:
+      address: '0x20000000'
+      data: ../bootable_images/MCXN_ram_reset_app.bin
+
+  # Write CUST-MK-SK into CMPA
+  - loadKeyBlob:
+      offset: 0
+      wrappingKeyId: NXP_CUST_KEK_EXT_SK
+      file: cust_mk_sk.bin
+      plainInput: bin
+
+  # Launch reset app to reset the processor (soft reset)
+  - execute:
+      address: '0x20000000'
+
+
+# ALL SUPPORTED SB COMMANDS:
+# - checkFwVersion(value, counterId);
+# - configureMemory(configAddress, memoryId);
+# - copy(addressFrom, memoryIdFrom, size, addressTo, memoryIdTo);
+# - erase(address, size, memoryId);
+# - execute(address);
+# - fillMemory(address, size, pattern);
+# - load(address, memoryId, data, compress, sectorSize);
+# - loadCMAC(address, memoryId, file);
+# - loadHashLocking(address, memoryId, file);
+# - loadKeyBlob(offset, wrappingKeyId, file, plainInput);
+# - programFuses(address, values);
+# - programIFR(address, data);

@@ -137,6 +137,14 @@ switch ($args[0]) {
         }
     }
 
+    "reset" {
+    Write-Host ""
+    Write-Host "=== Resetting MCU ==="
+    Write-Host ""
+
+    & LinkServer.exe probe "#1" wiretimedreset
+    }
+
     # --------------------------------------------------------
     # UNKNOWN COMMAND
     # --------------------------------------------------------

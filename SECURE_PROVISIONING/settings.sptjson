@@ -1,0 +1,179 @@
+{
+    "secure_provisioning_tool": "26.06",
+    "uuid": "60fa4556-32d8-41cd-8285-b3d5a19699cb",
+    "profile_name": "Plain signed image running on onchip flash",
+    "processor": "MCXN947",
+    "boot_type": "signed_sb",
+    "boot_device": {
+        "device_type": "onchip_memory",
+        "device_name": "internal flash",
+        "device_id": "Internal_Flash",
+        "device_producer": "NXP",
+        "comment": "Default boot memory (internal flash) for the processor (MCXN947) is set.",
+        "last_template": "Internal_Flash"
+    },
+    "life_cycle": "open_develop",
+    "trust_provisioning_type": "device_hsm",
+    "trust_provi_el2go": {
+        "el2go_api_key": "",
+        "device_group_id": "",
+        "nc12_int": "0",
+        "secure_objects_addr_int": "0x001FE000",
+        "el2go_server_url": "",
+        "wpc_qi_id": 0,
+        "wpc_target_type": "mboot",
+        "per_product_batch_size": 100,
+        "per_product_num_batches": 1
+    },
+    "connection": {
+        "connection_type": "usb",
+        "usb_hid": {
+            "usbVid_int": "0x1FC9",
+            "usbPid_int": "0x014F"
+        },
+        "uart_port": "COM3",
+        "uart_speed": 115200
+    },
+    "build_image_settings": {
+        "source_image_path": "../FW/build/mcuboot/zephyr/zephyr.elf",
+        "secured_firmware_version_int": "0",
+        "start_address_int": "0x10000000",
+        "dcd_type": "None",
+        "tz_enable": true,
+        "img_key_id": "IMG1_1",
+        "sbkek": "6AD95BCF084F9F33912B21707F3124E912B93938A523251474B37D5260768034",
+        "sb_seed": "F9A4E09AF879F08B1E2F705E6097D88B",
+        "sb_key_source": "KeyStore",
+        "user_pfr_configuration": {
+            "cfpa": {
+                "field004": {
+                    "field004-bits0-23": "RAW:0xff_ffff"
+                },
+                "field0C0": {
+                    "field0C0-bits0-2": "RAW:0b000"
+                }
+            },
+            "cmpa": {
+                "field050": {
+                    "field050-bits0-1": "RAW:0b11"
+                }
+            },
+            "cmpa_bootloader": {},
+            "cmpa_password": {},
+            "cmpa_lifecycle": {}
+        },
+        "script_updated": false,
+        "updated": false
+    },
+    "write_image_settings": {
+        "binary_image_path": "bootable_images/zephyr.sb",
+        "binary_image_reuse": true,
+        "updated": false
+    },
+    "keys_management_settings": {
+        "pki_tree": {
+            "ca": {
+                "key_id": "",
+                "key_path": ""
+            },
+            "srk_keys": [],
+            "rot_keys": [
+                {
+                    "key_id": "ROT1",
+                    "key_path": "keys/ROT1_p256.pub",
+                    "img_keys": [
+                        {
+                            "key_id": "IMG1_1",
+                            "key_path": "keys/IMG1_1_p256.pub"
+                        }
+                    ],
+                    "int_keys": []
+                },
+                {
+                    "key_id": "ROT2",
+                    "key_path": "keys/ROT2_p256.pub",
+                    "img_keys": [
+                        {
+                            "key_id": "IMG2_1",
+                            "key_path": "keys/IMG2_1_p256.pub"
+                        }
+                    ],
+                    "int_keys": []
+                },
+                {
+                    "key_id": "ROT3",
+                    "key_path": "keys/ROT3_p256.pub",
+                    "img_keys": [
+                        {
+                            "key_id": "IMG3_1",
+                            "key_path": "keys/IMG3_1_p256.pub"
+                        }
+                    ],
+                    "int_keys": []
+                },
+                {
+                    "key_id": "ROT4",
+                    "key_path": "keys/ROT4_p256.pub",
+                    "img_keys": [
+                        {
+                            "key_id": "IMG4_1",
+                            "key_path": "keys/IMG4_1_p256.pub"
+                        }
+                    ],
+                    "int_keys": []
+                }
+            ],
+            "certificate_signing_keys": [],
+            "production_audit_log_keys": []
+        }
+    },
+    "keys_generation_settings": {
+        "public_keys_infrastructure_type": "ECC_ROT",
+        "num_certificates_in_chain": 2,
+        "serial": "0",
+        "certificate_authority": {
+            "mode": "generate_ca"
+        },
+        "public_key_infrastructure": {
+            "pki_type": "ECC",
+            "key_length": "p256",
+            "duration": 10
+        },
+        "root_keys": {
+            "count": 4
+        }
+    },
+    "sign_mcu_boot_img_settings": {
+        "input_path": "../FW/build/FW/zephyr/zephyr.signed.bin",
+        "output_path": "bootable_images/zephyr.signed_signed.bin",
+        "signing_priv_key_path": "keys/IMG1_1_p256.pem",
+        "imgtools_args": [
+            {
+                "version": "1.0"
+            },
+            {
+                "header-size": "0x400"
+            },
+            {
+                "pad-header": ""
+            },
+            {
+                "slot-size": "0x100000"
+            },
+            {
+                "align": "16"
+            },
+            {
+                "pad": ""
+            },
+            {
+                "confirm": ""
+            }
+        ],
+        "re_create_pre_build_script": true,
+        "pre_build_script_index": 0,
+        "set_additional_image": true,
+        "additional_image_index": 0,
+        "additional_image_addr_int": "0"
+    }
+}

@@ -1,0 +1,76 @@
+# ==================================  SB configuration from Secure Provisioning Tool  ==================================
+
+# ======================================================================================================================
+#                                                 == General Options ==                                                 
+# ======================================================================================================================
+# -------------------------------------===== The chip family name [Required] =====--------------------------------------
+# Description: NXP chip family identifier.
+family: mcxn947
+# ======================================================================================================================
+#                                                  == Basic Settings ==                                                 
+# ======================================================================================================================
+# ---------------------------------------===== Firmware version. [Optional] =====---------------------------------------
+# Description: Value compared with Secure_FW_Version monotonic counter value stored in protected memory (MCU specific).
+# If value is lower than value in protected memory, then is image rejected (rollback protection).
+firmwareVersion: 0
+# -----------------------------------------===== SB3 filename [Required] =====------------------------------------------
+# Description: Generated SB3 container filename.
+containerOutputFile: ../bootable_images/zephyr.sb
+# ======================================================================================================================
+#                                              == Image Signing Settings ==                                             
+# ======================================================================================================================
+# -------------------------------------===== Signer configuration [Required] =====--------------------------------------
+# Description: Signature provider configuration in format 'type=<sp_type>;<key1>=<value1>;<key2>=<value2>' or path to a
+# private key.
+signer: type=file;file_path=../keys/IMG1_1_p256.pem
+# ======================================================================================================================
+#                                              == Certificate Block V2.1 ==                                             
+# ======================================================================================================================
+# -----------------------------===== Certificate Block binary/config file [Required] =====------------------------------
+# Description: Path to certificate block binary or config file.
+certBlock: ../keys/IMG1_1_cert_block.bin
+# ======================================================================================================================
+#                                           == Secure Binary v3.1 Settings ==                                           
+# ======================================================================================================================
+# ---------------------------------===== Part Common Key [Conditionally required] =====---------------------------------
+# Description: Path to PCK/NPK 256 or 128 bit key in plain hex string format or path to binary file or hex string.
+containerKeyBlobEncryptionKey: 6AD95BCF084F9F33912B21707F3124E912B93938A523251474B37D5260768034
+# ------------------------------------------===== Description [Optional] =====------------------------------------------
+# Description: Description up to 16 characters, longer will be truncated. Stored in SB3.1 manifest.
+description: MCXN947 SB3
+# ======================================================================================================================
+#                                   == Secure Binary v3.1 / v4.0 Commands Settings ==                                   
+# ======================================================================================================================
+commands:
+
+  # Check firmware versions
+  - checkFwVersion:
+      value: 0
+      counterId: secure
+
+  # Erase flash for the image 0
+  - erase:
+      address: 0
+      size: '0x0000E000'
+      memoryId: 0
+
+  # Write the application image 0 to flash
+  - load:
+      address: 0
+      memoryId: 0
+      data: ../bootable_images/zephyr.bin
+
+
+# ALL SUPPORTED SB COMMANDS:
+# - checkFwVersion(value, counterId);
+# - configureMemory(configAddress, memoryId);
+# - copy(addressFrom, memoryIdFrom, size, addressTo, memoryIdTo);
+# - erase(address, size, memoryId);
+# - execute(address);
+# - fillMemory(address, size, pattern);
+# - load(address, memoryId, data);
+# - loadCMAC(address, memoryId, file);
+# - loadHashLocking(address, memoryId, file);
+# - loadKeyBlob(offset, wrappingKeyId, file, plainInput);
+# - programFuses(address, values);
+# - programIFR(address, data);

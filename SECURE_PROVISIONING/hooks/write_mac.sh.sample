@@ -1,0 +1,63 @@
+#! /bin/bash
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+# This is sample of the write hooks, that are executed from the write script. This allows to customize the operation executed from the write script
+# Use parameter: "<step>" to identify which hook should be executed
+case "${1}" in
+  started)
+    # hook executed before any other command is executed
+    echo "### execution of write-hook: started ###"
+    ;;
+  erase_done)
+    # hook executed after erase of the memory is done
+    echo "### execution of write-hook: erase_done ###"
+    ;;
+  configure_ext_memory_done)
+    # hook executed after external memory configuration is done
+    echo "### execution of write-hook: configure_ext_memory_done ###"
+    ;;
+  create_fcb_done)
+    # hook executed after creation of FCB in the memory is done
+    echo "### execution of write-hook: create_fcb_done ###"
+    ;;
+  cfpa_written)
+    # hook executed after write of the CFPA is done
+    echo "### execution of write-hook: cfpa_written ###"
+    ;;
+  cmpa_written)
+    # hook executed after write of the CMPA is done
+    echo "### execution of write-hook: cmpa_written ###"
+    ;;
+  device_provisioning_sb_processed)
+    # hook executed after device provisioning SB file is processed
+    echo "### execution of write-hook: device_provisioning_sb_processed ###"
+    ;;
+  el2go_provisioning_completed)
+    # hook executed after EgdeLock 2GO provisioning is completed
+    echo "### execution of write-hook: el2go_provisioning_completed ###"
+    ;;
+  image_written)
+    # hook executed after write of the image is done
+    echo "### execution of write-hook: image_written ###"
+    ;;
+  additional_images_written)
+    # hook executed after write of additional images is done
+    echo "### execution of write-hook: additional_images_written ###"
+    ;;
+  sb_file_processed)
+    # hook executed after processing of SB file is done
+    echo "### execution of write-hook: sb_file_processed ###"
+    ;;
+  all_fuses_burnt)
+    # hook executed after fuse burn is done
+    echo "### execution of write-hook: all_fuses_burnt ###"
+    ;;
+  finished)
+    # hook executed after all steps of the script were executed
+    echo "### execution of write-hook: finished ###"
+    ;;
+  *)
+    echo "parameter ${1} is not supported"
+    exit 2
+    ;;
+esac
